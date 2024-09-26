@@ -216,10 +216,25 @@ void tmate_websocket_exec(struct tmate_session *session, const char *command)
 	pack(string, command);
 }
 
+int tmate_set_num_clients()
+{
+	int num_clients = 0;
+	struct client *c;
+	TAILQ_FOREACH(c, &clients, entry) {
+		++num_clients;
+	}
+	char *num_clients_str;
+	xasprintf(&num_clients_str, "%d", num_clients);
+	tmate_set_env("tmate_num_clients", num_clients_str);
+	free(num_clients_str);
+	tmate_debug("tmate_num_clients: %d", num_clients);
+}
+
 void tmate_notify_client_join(__unused struct tmate_session *session,
 			      struct client *c)
 {
 	tmate_info("Client joined (cid=%d)", c->id);
+	tmate_set_num_clients();
 
 	if (!tmate_has_websocket())
 		return;
@@ -241,6 +256,7 @@ void tmate_notify_client_left(__unused struct tmate_session *session,
 		return;
 
 	tmate_info("Client left (cid=%d)", c->id);
+	tmate_set_num_clients();
 
 	if (!tmate_has_websocket())
 		return;
