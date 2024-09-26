@@ -79,6 +79,8 @@ static void tmate_header(struct tmate_session *session,
 	tmate_set_env("tmate_ssh", ssh_conn_str);
 	free(ssh_conn_str);
 
+	tmate_set_env("tmate_num_clients", "0");
+
 	tmate_send_client_ready();
 }
 
